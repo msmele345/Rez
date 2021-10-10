@@ -1,0 +1,1 @@
+mongoimport --db Practice --collection restaurant --file  /tmp/restaurants.json

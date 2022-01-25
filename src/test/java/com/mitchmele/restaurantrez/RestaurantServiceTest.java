@@ -1,5 +1,6 @@
 package com.mitchmele.restaurantrez;
 
+import com.mitchmele.restaurantrez.model.GradesItem;
 import com.mitchmele.restaurantrez.model.Restaurant;
 import com.mitchmele.restaurantrez.restaurant.RestaurantRepository;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -58,5 +60,47 @@ class RestaurantServiceTest {
                 .usingRecursiveComparison()
                 .ignoringFields("restaurantId")
                 .isEqualTo(expected);
+    }
+
+    @Test
+    void getTrendingRestaurants_returnsWithAllAGrades() {
+
+        GradesItem e1 = GradesItem.builder().grade("A").score(120).build();
+        GradesItem e2 = GradesItem.builder().grade("A").score(110).build();
+
+        List<GradesItem> grades1 = List.of(e1, e2);
+
+        Restaurant restaurant = Restaurant.builder()
+                .name("Freds")
+                .borough("Manhattan")
+                .grades(grades1)
+                .build();
+
+        GradesItem c1 = GradesItem.builder().grade("B").score(81).build();
+        GradesItem c2 = GradesItem.builder().grade("A").score(110).build();
+
+        List<GradesItem> grades2 = List.of(c1, c2);
+
+        Restaurant restaurant2 = Restaurant.builder()
+                .name("Timmys")
+                .borough("Queens")
+                .grades(grades2)
+                .build();
+
+        GradesItem d1 = GradesItem.builder().grade("B").score(81).build();
+        GradesItem d2 = GradesItem.builder().grade("C").score(11).build();
+
+        List<GradesItem> grades3 = List.of(d1, d2);
+
+        Restaurant restaurant3 = Restaurant.builder()
+                .name("Bobs")
+                .borough("Staten Island")
+                .grades(grades3)
+                .build();
+
+        when(repository.findAll()).thenReturn(asList(restaurant, restaurant2, restaurant3));
+
+        List<Restaurant> actual = service.getTrending();
+        assertThat(actual).usingRecursiveComparison().isEqualTo(List.of(restaurant));
     }
 }

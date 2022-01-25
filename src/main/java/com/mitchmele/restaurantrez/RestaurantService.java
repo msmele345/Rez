@@ -25,6 +25,14 @@ public class RestaurantService {
                 .collect(Collectors.toList());
     } //add a sort feature that sorts on the high grades for a trending feature
 
+    public List<Restaurant> getTrending() {
+        return repository.findAll()
+                .parallelStream()
+                .filter(rez -> rez.getGrades().stream().allMatch(gradesItem -> "A".equals(gradesItem.getGrade())))
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
     public List<Restaurant> getAllRestaurantsByBorough(String borough) {
         return repository.findAllByBorough(borough)
                 .stream()

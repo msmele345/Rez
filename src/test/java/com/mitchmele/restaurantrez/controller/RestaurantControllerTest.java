@@ -1,8 +1,5 @@
 package com.mitchmele.restaurantrez.controller;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mitchmele.restaurantrez.RestaurantService;
 import com.mitchmele.restaurantrez.model.Restaurant;
@@ -18,20 +15,17 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class RestaurantControllerTestIT {
+class RestaurantControllerTest {
 
     @MockBean
     private RestaurantService restaurantService;
@@ -57,6 +51,19 @@ class RestaurantControllerTestIT {
         mockMvc.perform(get("/api/v1/restaurants/random"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(mapper.writeValueAsString(expected)));
+    }
+
+    @Test
+    void getTrending_returnsRestaurantsWithOnlyAGrades() throws Exception {
+        Restaurant restaurant = Restaurant.builder().build();
+        List<Restaurant> expected = List.of(restaurant);
+        when(restaurantService.getTrending()).thenReturn(expected);
+
+        mockMvc.perform(get("/api/v1/trending"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(mapper.writeValueAsString(expected)));
+
+        verify(restaurantService).getTrending();
     }
 
     @Test
